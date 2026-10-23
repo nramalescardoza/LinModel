@@ -1,124 +1,187 @@
+
 ---
 title: "Linear Model with Prediction"
-author: "Dr. J"
+author: "Nathan Ramales"
 date: "`r Sys.Date()`"
 output: html_document
 ---
 
-This project is an exploration of linear models. Models are estimated by linear regression.  The data set is from Motor Trend magazine.
+# Introduction
 
-The assignment is based on estimation of 3 models:
-1. mpg as a function of cyl
-2. mpg as a function of disp
-3  mpg as a function of both cyl and disp
+This project explores linear regression using the built-in `mtcars` dataset. The purpose is to examine the relationship between miles per gallon (mpg), number of cylinders (cyl), and engine displacement (disp).
 
-Complete a linear model with data description, a model fit a, and a prediction of mpg based on weigth of 3.050 lbs, with a displacement of 122 cubic inches (this is 2.5 L).
+Three linear regression models will be estimated:
 
-use an anova to compare model 2 with model 3
+1. MPG as a function of cylinders.
+2. MPG as a function of displacement.
+3. MPG as a function of cylinders and displacement.
+
+An ANOVA test will compare Models 2 and 3. Finally, a prediction will be made for a vehicle weighing 3,050 pounds with an engine displacement of 122 cubic inches.
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 ```
-# Load the dataset (built-in)
+
+# Load the Data
+
+The `mtcars` dataset contains information about 32 automobiles. The response variable is mpg, which measures miles per gallon. The predictors are cyl, which represents the number of cylinders, and disp, which represents engine displacement in cubic inches.
 
 ```{r}
 data(mtcars)
-```
 
-# View first 6 rows and summary
-```{r}
+# Display the first six rows
 head(mtcars)
+
+# Display the structure and summary
+str(mtcars)
+summary(mtcars)
 ```
 
-# Model 1:
- mpg (miles per gallon) is the response (Y)
- wt (wt) is the predictor (X)
+# Model 1: MPG as a Function of Cylinders
 
-## data summary
-### graphical summary
-
-### numerical summary
-
-### model summary
+## Graphical Summary
 
 ```{r}
-model1 <- lm(mpg ~ wt, data = mtcars)
+plot(mpg ~ cyl, data = mtcars,
+     main = "MPG vs. Number of Cylinders",
+     xlab = "Number of Cylinders",
+     ylab = "Miles per Gallon",
+     pch = 19, col = "blue")
+
+abline(lm(mpg ~ cyl, data = mtcars),
+       col = "red", lwd = 2)
+```
+
+The scatterplot shows the relationship between the number of cylinders and fuel efficiency. A downward trend indicates that vehicles with more cylinders tend to have lower mpg.
+
+## Numerical Summary
+
+```{r}
+summary(mtcars$cyl)
+summary(mtcars$mpg)
+cor(mtcars$cyl, mtcars$mpg)
+```
+
+## Model Summary
+
+```{r}
+model1 <- lm(mpg ~ cyl, data = mtcars)
 summary(model1)
 ```
+
+The regression model estimates mpg using the number of cylinders. The slope coefficient represents the estimated change in mpg associated with one additional cylinder. The R-squared value indicates the proportion of variation in mpg explained by cylinders.
+
+# Model 2: MPG as a Function of Displacement
+
+## Graphical Summary
+
 ```{r}
-newData = data.frame(wt=3.050, disp=122)
-print(predict(model1, newData, interval = 'predict'))
+plot(mpg ~ disp, data = mtcars,
+     main = "MPG vs. Engine Displacement",
+     xlab = "Displacement (cubic inches)",
+     ylab = "Miles per Gallon",
+     pch = 19, col = "blue")
+
+abline(lm(mpg ~ disp, data = mtcars),
+       col = "red", lwd = 2)
 ```
 
-### predicted mpg
+The scatterplot helps show whether engine displacement is associated with fuel efficiency.
 
-# Model 2:
+## Numerical Summary
 
- mpg (miles per gallon) is the response (Y)
- wt (wt) is the predictor (X)
+```{r}
+summary(mtcars$disp)
+cor(mtcars$disp, mtcars$mpg)
+```
 
-## data summary
-### graphical summary
-
-### numerical summary
-
-### model summary
-
+## Model Summary
 
 ```{r}
 model2 <- lm(mpg ~ disp, data = mtcars)
 summary(model2)
 ```
-### predicted mpg 
 
-# Model 3 :
+The slope coefficient estimates the change in mpg associated with a one-cubic-inch increase in engine displacement. The R-squared value describes how much variation in mpg is explained by displacement alone.
 
- mpg (miles per gallon) is the response (Y)
- wt and disp are the predictors (X's)
+# Model 3: MPG as a Function of Cylinders and Displacement
 
-## data summary
-### graphical summary
+## Graphical Summary
+
 ```{r}
-plot(mpg ~ wt+disp, data = mtcars)
+pairs(mtcars[, c("mpg", "cyl", "disp")],
+      main = "MPG, Cylinders, and Displacement",
+      pch = 19, col = "blue")
 ```
-### numerical summary
 
-### model summary
-model3= lm(mpg ~ wt+disp, data = mtcars)
-model summary (coefficients, R², etc.), summarize the fit
+The scatterplot matrix displays the relationships between mpg, cylinders, and displacement.
+
+## Numerical Summary
 
 ```{r}
-model3= lm(mpg ~ wt+disp, data = mtcars)
-summary(model3)
+summary(mtcars[, c("mpg", "cyl", "disp")])
+cor(mtcars[, c("mpg", "cyl", "disp")])
 ```
- mpg (miles per gallon) is the response (Y)
- wt (wt) and displacement (disp) are the predictors (X's)
 
-## data summary
-
-### graphical summary
-```{r}
-plot(mpg ~ wt+disp, data=mtcars)
-```
-### numerical summary
-
-### model summary
-
-# anova: compare models 2 and 3
-
-model3 <- lm(mpg ~ wt+disp, data = mtcars)
-
-model summary (coefficients, R², etc.)
-
-### predicted mpg
+## Model Summary
 
 ```{r}
+model3 <- lm(mpg ~ cyl + disp, data = mtcars)
 summary(model3)
 ```
 
+This multiple regression model uses both cylinders and displacement to estimate mpg. Each coefficient represents the estimated relationship between a predictor and mpg while holding the other predictor constant. The adjusted R-squared value accounts for the number of predictors in the model.
+
+# ANOVA: Compare Models 2 and 3
+
+Model 2 uses displacement alone, while Model 3 uses both displacement and cylinders. ANOVA tests whether adding cylinders significantly improves the model fit.
+
 ```{r}
-anova_result <- anova(model1, model3)
-print(anova_result)
+anova_result <- anova(model2, model3)
+anova_result
 ```
 
-# Discussion and Conculsions
+The null hypothesis is that adding cylinders does not significantly improve the model beyond displacement alone. The alternative hypothesis is that adding cylinders improves the model.
+
+If the ANOVA p-value is less than 0.05, the null hypothesis is rejected. This indicates that adding cylinders significantly improves the model fit. If the p-value is greater than or equal to 0.05, there is insufficient evidence of a significant improvement at the 5% level.
+
+# Prediction of MPG
+
+The assignment asks for a prediction for a vehicle weighing 3,050 pounds with a displacement of 122 cubic inches. In the `mtcars` dataset, weight is measured in thousands of pounds, so 3,050 pounds is entered as 3.050.
+
+Because the prediction uses weight and displacement, an additional model will be fitted using both variables.
+
+```{r}
+prediction_model <- lm(mpg ~ wt + disp, data = mtcars)
+
+newData <- data.frame(wt = 3.050, disp = 122)
+
+prediction <- predict(
+  prediction_model,
+  newdata = newData,
+  interval = "predict",
+  level = 0.95
+)
+
+prediction
+```
+
+The `fit` value is the predicted mpg. The `lwr` and `upr` values represent the lower and upper limits of the 95% prediction interval for an individual vehicle.
+
+```{r}
+summary(prediction_model)
+```
+
+# Discussion and Conclusions
+
+The three regression models investigate the relationship between fuel efficiency and engine characteristics.
+
+Model 1 estimates mpg using the number of cylinders. Model 2 estimates mpg using engine displacement. Model 3 combines cylinders and displacement to determine whether using both predictors improves the explanation of fuel efficiency.
+
+The regression coefficients describe the estimated relationships between the predictors and mpg. The R-squared values indicate the proportion of variation in mpg explained by each model. The p-values help determine whether the relationships are statistically significant.
+
+The ANOVA comparison determines whether adding cylinders to the displacement-only model significantly improves the fit. The conclusion depends on the p-value reported by R.
+
+Finally, the additional model using weight and displacement estimates mpg for a vehicle weighing 3,050 pounds with an engine displacement of 122 cubic inches. The prediction interval illustrates the uncertainty associated with predicting the mpg of an individual vehicle.
+
+Overall, linear regression provides a useful way to examine the relationships between vehicle characteristics and fuel efficiency. However, the models describe associations in the dataset and do not establish causation.
